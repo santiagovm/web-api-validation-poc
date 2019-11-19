@@ -18,15 +18,15 @@ namespace WebApiValidationPoC
             RuleFor(x => x.SIN)
                 .NotEmpty()
                 .WithMessage("SIN is mandatory")
-                .Must((user, list, context) =>
+                .Must((user, sin, context) =>
                 {
-                    if (null == user.SIN)
+                    if (null == sin)
                     {
                         return true;
                     }
                     
-                    context.MessageFormatter.AppendArgument("SIN", user.SIN);
-                    return Utilities.IsValidSIN(int.Parse(user.SIN));
+                    context.MessageFormatter.AppendArgument("SIN", sin);
+                    return Utilities.IsValidSIN(int.Parse(sin));
 
                 })
                 .WithMessage("SIN ({SIN}) is not valid");

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -24,21 +25,20 @@ namespace WebApiValidationPoC
             services.AddSingleton<IValidator<User>, UserValidator>();
             
             // todo: wire up validators in http pipeline
-            services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddFluentValidation();
+            services.AddMvc()
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                    .AddFluentValidation();
 
             // todo: override default behavior for InvalidModelState management
             services.Configure<ApiBehaviorOptions>(options =>
                 {
                     options.InvalidModelStateResponseFactory = context =>
                     {
-                        var errors = context
-                            .ModelState
-                            .Values
-                            .SelectMany(entry => entry.Errors.Select(modelError => modelError.ErrorMessage))
-                            .ToList();
+                        List<string> errors = context.ModelState
+                                                     .Values
+                                                     .SelectMany(modelStateEntry =>
+                                                         modelStateEntry.Errors.Select(modelError => modelError.ErrorMessage))
+                                                     .ToList();
 
                         var result = new
                         {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace webapi_validation_poc.Controllers
+namespace WebApiValidationPoC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -24,10 +21,12 @@ namespace webapi_validation_poc.Controllers
             return "value";
         }
 
+        // todo: validations kick in when controller receives model
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post(User user)
         {
+            return NoContent();
         }
 
         // PUT api/values/5

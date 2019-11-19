@@ -24,6 +24,9 @@
           <e p="launchSettings.json" t="Include" />
         </e>
         <e p="Startup.cs" t="Include" />
+        <e p="User.cs" t="Include" />
+        <e p="UserValidator.cs" t="Include" />
+        <e p="Utilities.cs" t="Include" />
         <e p="webapi-validation-poc.csproj" t="IncludeRecursive" />
       </e>
       <e p="webapi-validation-poc.sln" t="IncludeFlat" />

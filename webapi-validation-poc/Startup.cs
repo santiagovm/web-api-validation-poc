@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace webapi_validation_poc
+namespace WebApiValidationPoC
 {
     public class Startup
     {
@@ -22,13 +18,40 @@ namespace webapi_validation_poc
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            // todo: wire up validators in DI container
+            services.AddSingleton<IValidator<User>, UserValidator>();
+            
+            // todo: wire up validators in http pipeline
+            services
+                .AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddFluentValidation();
+
+            // todo: override default behavior for InvalidModelState management
+            services.Configure<ApiBehaviorOptions>(options =>
+                {
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        var errors = context
+                            .ModelState
+                            .Values
+                            .SelectMany(entry => entry.Errors.Select(modelError => modelError.ErrorMessage))
+                            .ToList();
+
+                        var result = new
+                        {
+                            Code = "00009",
+                            Message = "Validation errors",
+                            Errors = errors,
+                        };
+                        
+                        return new BadRequestObjectResult(result);
+                    };
+                });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
